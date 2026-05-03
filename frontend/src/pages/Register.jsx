@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 
 const passwordRules = [
-  { label: 'At least 8 characters', test: (p) => p.length >= 8 },,
-  { label: 'One lowercase letter (a-z)', test: (p) => /[a-z]/.test(p) },
-  { label: 'One number (0-9)', test: (p) => /[0-9]/.test(p) },
+  { label: 'At least 8 characters', test: (p) => p.length >= 8 },
+  { label: 'One uppercase letter (A–Z)', test: (p) => /[A-Z]/.test(p) },
+  { label: 'One lowercase letter (a–z)', test: (p) => /[a-z]/.test(p) },
+  { label: 'One number (0–9)', test: (p) => /[0-9]/.test(p) },
+  { label: 'One special character (!@#$%^&*...)', test: (p) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p) },
 ];
 
 export default function Register() {
@@ -35,7 +37,12 @@ export default function Register() {
     <div className="auth-container">
       <div className="auth-card">
         <h1>Register</h1>
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && (
+          <div className="alert alert-error">
+            <span className="alert-icon">⚠</span>
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username</label>
@@ -70,13 +77,14 @@ export default function Register() {
               required
             />
             {passwordTouched && (
-              <ul style={{ listStyle: 'none', padding: '6px 0 0', margin: 0, fontSize: '0.82rem' }}>
+              <div className="password-rules">
                 {passwordRules.map((rule) => (
-                  <li key={rule.label} style={{ color: rule.test(password) ? '#22c55e' : '#ef4444' }}>
-                    {rule.test(password) ? '✓' : '✗'} {rule.label}
-                  </li>
+                  <div key={rule.label} className={`password-rule ${rule.test(password) ? 'met' : 'unmet'}`}>
+                    <span className="rule-icon">{rule.test(password) ? '✓' : '✗'}</span>
+                    {rule.label}
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
           <div className="form-group">
@@ -91,7 +99,10 @@ export default function Register() {
             />
           </div>
           {confirmPassword && !passwordsMatch && (
-            <div className="alert alert-error">Passwords do not match</div>
+            <div className="alert alert-error">
+              <span className="alert-icon">⚠</span>
+              Passwords do not match
+            </div>
           )}
           <button
             type="submit"
