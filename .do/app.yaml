@@ -1,0 +1,50 @@
+name: todolistapp
+region: nyc
+
+services:
+  - name: backend
+    github:
+      repo: Amnoname/TODOLISTAPP
+      branch: main
+      deploy_on_push: true
+    source_dir: backend
+    build_command: npm install
+    run_command: npm start
+    http_port: 8080
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    routes:
+      - path: /api
+    envs:
+      - key: NODE_ENV
+        value: production
+        scope: RUN_TIME
+      - key: JWT_SECRET
+        value: CHANGE_ME_TO_A_STRONG_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+        scope: RUN_TIME
+
+static_sites:
+  - name: frontend
+    github:
+      repo: Amnoname/TODOLISTAPP
+      branch: main
+      deploy_on_push: true
+    source_dir: frontend
+    build_command: npm run build
+    output_dir: dist
+    index_document: index.html
+    error_document: index.html
+    routes:
+      - path: /
+
+databases:
+  - name: db
+    engine: PG
+    version: "15"
+    num_nodes: 1
+    size: db-s-dev-database
+    production: false
