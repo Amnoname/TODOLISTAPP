@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -445,6 +446,15 @@ app.get('/api/debug/assignments', authenticateToken, async (req, res) => {
   const users = await pool.query('SELECT * FROM users');
   res.json({ currentUserId: req.user.id, assignments: assignments.rows, users: users.rows });
 });
+
+// ==== SERVE FRONTEND (production) ====
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+  });
+}
 
 // ==== SERVER START ====
 
